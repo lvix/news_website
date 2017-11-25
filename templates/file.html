@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block header %}
+<span><a href="/">Home</a></span>
+<h1>{{ title }}</h1>
+<p>{{ created_time }}</p>
+{% endblock %}
+
+{% block main %}
+{% for line in content %}
+<p>{{ line }}</p>
+{% endfor %}
+{% endblock %}

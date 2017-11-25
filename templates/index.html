@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}
+News
+{% endblock %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block header %}
+<h1>News</h1>
+{% endblock %}
+
+{% block main %}
+<ul>
+{% for item in items: %}
+<li>
+<span><a href="/files/{{ item.file_name }}">{{ item.title }}</a></span>
+<span>{{ item.created_time }}</span>
+</li>
+{% endfor %}
+</ul>
+{% endblock %}
+

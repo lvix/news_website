@@ -1,0 +1,32 @@
+<html>
+	<head>
+		<title>
+			{% block title %}
+			Sample title
+			{% endblock %}
+		</title>
+		{% block css %}
+
+		{% endblock %}
+	</head>
+
+	<body>
+		<div id='header'>
+		{% block header %}
+		header
+		{% endblock %}
+		</div>
+		
+		<div id='main'>
+		{% block main %}
+		main content
+		{% endblock %}
+		</div>
+
+		<div id="footer">
+			{% block footer %}
+			&copy; Copyright 2017 by <a href="http://lvix.github.io">Lvix</a>
+			{% endblock %}
+		</div>
+	</body>
+</html>
