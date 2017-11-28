@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 from flask import Flask, request, render_template, abort
+from flask_sqlalchemy import SQLAlchemy 
 from datetime import datetime
 import os, json, operator
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root@localhost/news'
+db = SQLAlchemy(app)
+
 # classes
 class ArticleList(object):
 	"""
@@ -13,11 +19,15 @@ class ArticleList(object):
 
 	def __init__(self):
 		# print('start!')
-		self.article_list = self.update_article_list()
+		self.article_list = [] #load_articles_from_db()
+		# self.update_article_list()
 		# print(self.get_article_list())
+	def load_articles_from_db():
+		pass
 
 	def get_article_list(self):
-		art_list = self.load_article_list_json()
+		art_list = []
+		# self.load_article_list_json()
 		return art_list[:-1]
 
 	def load_article_list_json(self):
@@ -117,7 +127,7 @@ class Article(object):
 
 	def __init__(self, filename):
 		self.filename = filename
-		self.article_item = self.read_article_json()
+		self.article_item = None # self.read_article_json()
 
 	def read_article_json(self):
 		file_path = self.article_json_dir + self.get_file_name() + '.json'
@@ -144,9 +154,49 @@ class Article(object):
 			content = content_ori.split(r'\n')
 		return content
 
-alist = ArticleList()
+class Post(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	title = db.Column(db.String(80))
+	created_time = db.Column(db.DateTime)
+	category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+	content = db.Column(db.Text)
 
-app = Flask(__name__)
+	category = db.relationship('Category', backref=db.backref('posts', lazy='dynamic'))
+
+	def __init__(self, title, category, content, created_time=None):
+		self.title = title
+		self.category = category
+		if not created_time:
+			self.created_time = datetime.utcnow()
+		else:
+			self.created_time = created_time
+		self.content = content
+
+	def __repr__(self):
+		return '<Post %r>' % self.title 
+
+
+class Category(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	name = db.Column(db.String(80))
+
+	def __init__(self, name):
+		self.name = name
+
+	def __repr__(self):
+		return '<Category %r>' % self.name 
+
+
+alist = ArticleList()
+def get_article_items_from_db():
+	plist = db.session.query(Post).all()
+	nlist = []
+	for po in plist:
+		_ctime = datetime.strftime(po.created_time, '%Y-%m-%d %H:%M:%S')
+		p_item = {'file_name':po.id, 'title':po.title, 'created_time':_ctime}
+		nlist.append(p_item)
+	return nlist 
+
 
 @app.errorhandler(404)
 def not_found(error):
@@ -155,7 +205,8 @@ def not_found(error):
 @app.route('/')
 def index():
 	try:
-		items = alist.get_article_list()
+		# items = alist.get_article_list()
+		items = get_article_items_from_db()
 	except:
 		abort(404)
 	# print(items)
@@ -163,12 +214,21 @@ def index():
 
 @app.route('/files/<filename>')
 def file(filename):
+	# try:
+		# article = Article(filename)
+	# except:
+		# abort(404)
 	try:
-		article = Article(filename)
+		article = db.session.query(Post).filter(Post.id==str(filename)).first()
 	except:
 		abort(404)
-	title = article.get_article_title()
-	created_time = article.get_article_created_time()
-	content = article.get_article_content()
+	if not article:
+		abort(404)
+	title = article.title
+	created_time = datetime.strftime(article.created_time, '%Y-%m-%d %H:%M:%S')
+	print(type(article.content))
+	print(article.content)
+	content = article.content
+
 	# print(content)
 	return render_template('file.html', title=title, created_time=created_time, content=content)
