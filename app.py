@@ -42,7 +42,7 @@ class Post(db.Model):
 			# print('tags:', tags )
 			if tag_name not in tags:
 				tags.append(tag_name)
-				# print(new_tags)
+				print(tags)
 				mdb.news.update({'id':self.id}, {'$set':{'tags':tags}})
 		except:
 			print('cannot add tag')

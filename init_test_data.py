@@ -1,8 +1,17 @@
-#!/usr/bin/env/ python3
+#!/usr/bin/env python3
 
 from app import db, Post, Category
 from datetime import datetime
+# sudo service mysql start
+# sudo pip3 install flask_sqlalchemy, mysqlclient
+# sudo pip3 install pymongo
 
+# mysql -u root
+# create database news;
+# mongo
+# use news;
+
+# ./inti_test_data.py 
 
 db.create_all()
 # # ?? MySQL ????
