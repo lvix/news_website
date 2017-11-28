@@ -17,7 +17,15 @@ News
 {% for item in items: %}
 <li>
 <span><a href="/files/{{ item.file_name }}">{{ item.title }}</a></span>
-<span>{{ item.created_time }}</span>
+<span>{{ item.created_time }}</span><br />
+{% if item.tags != None %}
+<span> tags: [
+{% for t in item.tags: %}
+{{ t }}
+{% endfor %} ]
+</span>
+{% endif %}
+
 </li>
 {% endfor %}
 </ul>
